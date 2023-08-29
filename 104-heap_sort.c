@@ -1,58 +1,96 @@
 #include "sort.h"
 
 /**
- * heapify - function  perform a heapify operation on an array
- * recurrssive heapSort
- * @array: a pointer to an array of integers
- * @heap: an integer representing the size of the heap data
- * @i: an integer representing the index of the current element
- * @size: an integer representing the size of the array
+ * swap_eles - used to swap two elements in an array.
+ * @array: a pointer to an array of integers to modify.
+ * @l: index of the first element to swap, left item.
+ * @r: index of the second element to swap, right item.
  */
-
-void heapify(int *array, int heap, int i, int size)
+void swap_eles(int *array, size_t l, size_t r)
 {
-	int lar = i, left = 2 * i + 1;
-	int right = 2 * i + 2, tmp;
+	int temp;
 
-	if (left < heap && array[left] > array[lar])
-		lar = left;
-	if (right < heap && array[right] > array[lar])
-		lar = right;
-	if (lar != i)
+	if (array != NULL)
 	{
-		tmp = array[i], array[i] = array[lar], array[lar] = tmp;
-		print_array(array, size);
-		heapify(array, heap, lar, size);
+		temp = array[l];
+		array[l] = array[r];
+		array[r] = temp;
 	}
 }
 
 /**
- * heap_sort - function uses the heapify function to build
- * a max-heap from the input array and then repeatedly extracts
- * the maximum element from the heap to sort the array
- * @array: a pointer to an array of integers to sort
- * @size: size of array to sort
+ * sifts_down - function is used to sift down an element in a
+ * max-heap, ensuring that the element is in its correct position
+ * by comparing it with its children and swapping if necessary
+ * Moves the largest element in an array to its correct
+ * sorted position in a max-heap sub-array.
+ * @array: pointer to an array of ints representing the heap to sort.
+ * @arr_size: The size/length of the array.
+ * @size: The size/length of the max heap sub-array.
+ * @pos: starting position to sift down from.
+ * position of the largest element in the max heap sub-array.
  */
+void sifts_down(int *array, int arr_size, int size, int pos)
+{
+	int j, child;
 
+	j = pos;
+	while (j < (size / 2))
+	{
+		child = (2 * j) + 1;
+		if ((child < (size - 1)) && (array[child] < array[child + 1]))
+			child++;
+		if (array[j] >= array[child])
+			return;
+		swap_eles(array, j, child);
+		print_array(array, arr_size);
+		j = child;
+	}
+}
+
+/**
+ * build_max_heap - functin builds a max heap binary tree with given array
+ * uses the sifts_down function to build a max-heap from the input array
+ * @array: a pointer to an array of integers to convert to a max
+ * heap binary tree.
+ * @size: The size/length of the array.
+ */
+void build_max_heap(int *array, int size)
+{
+	/*(size / 2) - 1 sets the starting index for the loop*/
+	/* to the last non-leaf node in the binary tree*/
+	/*representation of the array*/
+	int a;
+
+	for (a = (size / 2) - 1; a >= 0; a--)
+	{
+		sifts_down(array, size, size, a);
+	}
+}
+
+/**
+ * heap_sort -  function uses the build_max_heap function to build a
+ * max-heap from the input array and then repeatedly extracts the
+ * maximum element from the heap and places it in its correct position
+ * in the array.
+ * The sifts_down function is used to maintain the heap property
+ * during the extraction process
+ * @array: The array to sort.
+ * @size: The length of the array.
+ */
 void heap_sort(int *array, size_t size)
 {
-	/*size / 2 -1 sets the starting index for the heapify*/
-	/* operation to the last non-leaf node in the binary tree*/
-	/*representation of the array*/
-	int i = size / 2 - 1, tmp;
+	int i, n;
 
-	if (array == NULL || size < 2)
-		return;
-	for (; i >= 0; i--)
-		heapify(array, size, i, size);
-	for (i = size - 1; i >= 0; i--)
+	build_max_heap(array, size);
+	n = size;
+	for (i = 0; i < (int)size; i++)
 	{
-		tmp = array[0];
-		array[0] = array[i];
-		array[i] = tmp;
-		if (i > 0)
+		swap_eles(array, --n, 0);
+		if (n != 0)
+		{
 			print_array(array, size);
-		heapify(array, i, 0, size);
+			sifts_down(array, size, n, 0);
+		}
 	}
-
 }
